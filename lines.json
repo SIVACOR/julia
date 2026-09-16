@@ -1,0 +1,21 @@
+{
+  "_comment": [
+    "Which Julia lines this repo publishes, and from which Debian variant.",
+    "One GHCR package per line (10-D12): ghcr.io/sivacor/julia<line>.",
+    "",
+    "The variant is per line and explicit on purpose. Upstream publishes both",
+    "bookworm and trixie; moving a line between them changes glibc under the",
+    "researcher's code, so it must be a deliberate edit here and never a",
+    "default that drifts.",
+    "",
+    "Removing a line from this list stops future builds. It does NOT unpublish",
+    "anything -- a published tag is never deleted (10-D13), because a TRO that",
+    "cites it must keep resolving. Upstream does drop old lines from",
+    "versions.json; ours outlive that."
+  ],
+  "lines": [
+    { "line": "1.10", "variant": "bookworm" },
+    { "line": "1.11", "variant": "bookworm" },
+    { "line": "1.13", "variant": "bookworm" }
+  ]
+}

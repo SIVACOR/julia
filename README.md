@@ -40,6 +40,49 @@ A submission must ship a `Project.toml`. A `Manifest.toml` is optional but stron
 without one, phase 1 resolves whatever versions exist that day and writes the manifest it produced
 into the package, so the run is reproducible after the fact rather than by declaration.
 
+## Automated builds
+
+`.github/workflows/build.yml` runs daily, on `workflow_dispatch`, and on a push that touches the
+Dockerfile or the build config. It publishes one package per Julia line:
+
+```
+ghcr.io/sivacor/julia1.10        ghcr.io/sivacor/julia1.11        ghcr.io/sivacor/julia1.13
+```
+
+tagged `<julia patch>-<build date UTC>` — `1.11.9-20260916` — with a `.2`, `.3` … suffix if a line
+is built twice in one UTC day. **A tag is never overwritten and never deleted**, because a signed
+TRO cites the image it ran on and that reference has to keep resolving.
+
+**The trigger is the upstream digest, not the upstream version.** Two events must cause a rebuild
+and only one of them changes a version number: a new Julia patch release, and a rebuild of a tag we
+already built — which is how a Debian security fix reaches us, with the version identical and only
+the digest moved. Watching the digest covers both; watching the version misses the security one.
+
+`tracked.json` records, per line, the upstream digest last built and the tag published from it. It
+is committed by the workflow, so the question "which of our builds came from which upstream image"
+is answerable from the repo without a registry call.
+
+`plan_builds.py` is the whole decision and runs standalone — no docker, no credentials, stdlib
+only:
+
+```sh
+./plan_builds.py            # what would be built, and why
+./plan_builds.py --json
+```
+
+**Which lines to publish is `lines.json`,** including each line's Debian variant. The variant is
+per line and explicit: moving a line between `bookworm` and `trixie` changes glibc under the
+researcher's code, so it must be an edit here rather than a default that drifts. Note that upstream
+keys `versions.json` by `stable`/`rc` plus a key per older line, so the newest line has no key of
+its own — `plan_builds.py` resolves lines from each entry's `version` field instead, which survives
+`stable` moving when the next Julia lands.
+
+**New packages are private, and a private package breaks every run.** GHCR makes a package private
+when Actions first creates it, and a private one cannot be pulled anonymously — so every SIVACOR
+worker fails with `IMAGE_PULL_FAILED` and nothing is wrong with the image. The workflow checks for
+this after pushing and warns loudly; making it public is a one-off manual step per line at
+<https://github.com/orgs/SIVACOR/packages>.
+
 ## Build and check
 
 ```sh
@@ -53,5 +96,10 @@ docker build --build-arg JULIA_TAG=1.11.9-bookworm -t sivacor-julia:1.11.9-local
 analysis container — and asserts the resolve phase writes its manifest, does not re-clone the
 registry, and fails an unsatisfiable environment in phase 1 rather than phase 2.
 
+`check.sh` runs in CI **before the push**, not after. A published tag cannot be withdrawn, so the
+build is the last moment a broken image is still cheap to throw away.
+
 `measure-resolve.sh` times a cold resolve of a real AEA replication package's dependency set.
-**Where you run it is part of the measurement**: a fast link makes the download half disappear.
+**Where you run it is part of the measurement**: a fast link makes the download half disappear —
+though measured so far, roughly three quarters of both the time and the bytes are precompilation,
+which is CPU rather than network.

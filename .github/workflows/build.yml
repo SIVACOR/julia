@@ -1,0 +1,171 @@
+# Rebuild a Julia line whenever the upstream image it is built from moves.
+#
+# The trigger is the upstream DIGEST, not the upstream version -- see the
+# docstring in plan_builds.py for why the version alone misses Debian security
+# rebuilds, which are the ones that matter most.
+name: Build images
+
+on:
+  schedule:
+    # Daily. Upstream rebuilds on no announced cadence, and a day of latency on
+    # a Debian CVE fix is the budget here.
+    - cron: '17 4 * * *'
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - 'lines.json'
+      - 'plan_builds.py'
+      - 'check.sh'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: write   # to commit tracked.json
+  packages: write   # to push to ghcr.io/sivacor/* -- no secret needed (10-D14)
+
+# tracked.json is read at plan time and written at the end, so two overlapping
+# runs would each plan against a state the other is about to replace.
+concurrency:
+  group: build-images
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      any: ${{ steps.plan.outputs.any }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: plan
+        run: ./plan_builds.py --github-output | tee -a "$GITHUB_STEP_SUMMARY"
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build
+        run: |
+          docker build \
+            --build-arg JULIA_TAG='${{ matrix.version }}-${{ matrix.variant }}' \
+            -t 'candidate:${{ matrix.tag }}' .
+
+      # Before the push, deliberately. A published tag is never deleted or
+      # overwritten (10-D11/10-D13) because a TRO that cites it has to keep
+      # resolving -- so a broken image that reaches the registry is permanent.
+      # This is the last moment it is still cheap to throw away.
+      - name: Check
+        run: ./check.sh 'candidate:${{ matrix.tag }}'
+
+      - name: Push
+        run: |
+          echo '${{ secrets.GITHUB_TOKEN }}' \
+            | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+          ref='ghcr.io/sivacor/${{ matrix.package }}:${{ matrix.tag }}'
+          docker tag 'candidate:${{ matrix.tag }}' "$ref"
+          # Read the digest from push's own output rather than from
+          # `docker inspect .RepoDigests`, which is a list and needs the right
+          # element picked -- this image has exactly one digest and push prints
+          # it.
+          docker push "$ref" | tee /tmp/push.log
+          digest="$(grep -o 'sha256:[0-9a-f]\{64\}' /tmp/push.log | head -1)"
+          test -n "$digest"
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### \`${ref}\`"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| from | \`julia:${{ matrix.upstream_tag }}\` |"
+            echo "| upstream digest | \`${{ matrix.upstream_digest }}\` |"
+            echo "| published digest | \`${digest}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+        id: push
+
+      # A package Actions creates is PRIVATE by default, and a private package
+      # fails the anonymous pull on every worker -- arriving as
+      # IMAGE_PULL_FAILED on every Julia submission, with nothing wrong with the
+      # image. This cannot be fixed from here (it is an org setting), so the
+      # job's duty is to be loud about it rather than to succeed quietly.
+      - name: Warn if the package is not publicly pullable
+        run: |
+          repo='sivacor/${{ matrix.package }}'
+          token="$(curl -fsS "https://ghcr.io/token?scope=repository:${repo}:pull&service=ghcr.io" \
+                   | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')" || token=''
+          if [ -n "$token" ] && curl -fsS -o /dev/null \
+               -H "Authorization: Bearer ${token}" \
+               "https://ghcr.io/v2/${repo}/manifests/${{ matrix.tag }}"; then
+            echo "anonymous pull OK for ${repo}:${{ matrix.tag }}"
+          else
+            echo "::warning title=Package is not public::${repo} cannot be pulled anonymously. Every SIVACOR worker will fail with IMAGE_PULL_FAILED until it is made public at https://github.com/orgs/SIVACOR/packages"
+            {
+              echo
+              echo "> **This package is not publicly pullable.** Until it is made public at"
+              echo "> <https://github.com/orgs/SIVACOR/packages>, every SIVACOR worker pulling"
+              echo "> it fails with \`IMAGE_PULL_FAILED\` and nothing is wrong with the image."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Values arrive as environment variables, not interpolated into the
+      # Python source: a matrix value carrying a quote would otherwise be a
+      # syntax error at best.
+      - name: Record what was built
+        run: |
+          mkdir -p results
+          python3 -c '
+          import json, os, sys
+          keys = ("line", "variant", "version", "upstream_tag", "upstream_digest",
+                  "published_tag", "published_digest", "built_at")
+          json.dump({k: os.environ["R_" + k.upper()] for k in keys},
+                    open(sys.argv[1], "w"), indent=2)
+          ' "results/${R_LINE}.json"
+        env:
+          R_LINE: ${{ matrix.line }}
+          R_VARIANT: ${{ matrix.variant }}
+          R_VERSION: ${{ matrix.version }}
+          R_UPSTREAM_TAG: ${{ matrix.upstream_tag }}
+          R_UPSTREAM_DIGEST: ${{ matrix.upstream_digest }}
+          R_PUBLISHED_TAG: ${{ matrix.tag }}
+          R_PUBLISHED_DIGEST: ${{ steps.push.outputs.digest }}
+          # The build's own wall-clock, in UTC -- the same clock the tag's date
+          # stamp uses. Not the repository's updated_at, which is a different
+          # event entirely and is absent on a scheduled run.
+          R_BUILT_AT: ${{ github.run_started_at }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: result-${{ matrix.line }}
+          path: results/
+
+  record:
+    needs: [plan, build]
+    # Runs even if one line failed: the lines that did build must still be
+    # recorded, or the next run rebuilds them and republishes under a new tag
+    # for no reason.
+    if: always() && needs.plan.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with: { path: results, pattern: 'result-*', merge-multiple: true }
+      - name: Merge into tracked.json
+        run: |
+          python3 - <<'PY'
+          import glob, json, pathlib
+          tracked = json.load(open("tracked.json"))
+          for path in sorted(glob.glob("results/*.json")):
+              entry = json.load(open(path))
+              tracked[entry.pop("line")] = entry
+          pathlib.Path("tracked.json").write_text(json.dumps(tracked, indent=2, sort_keys=True) + "\n")
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add tracked.json
+          git diff --cached --quiet || git commit -m 'Record published images [auto]'
+          git push
