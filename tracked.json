@@ -1,1 +1,29 @@
-{}
+{
+  "1.10": {
+    "built_at": "",
+    "published_digest": "sha256:d192705c4cf1842c1d8be4fb96a6a71101644913e8f9a03badff1e65ab17e8ba",
+    "published_tag": "1.10.12-20260916",
+    "upstream_digest": "sha256:6b2f2be23331f8977f8845912667bf6cf9c700e7857558188b6eb44f73eef8d0",
+    "upstream_tag": "1.10.12-bookworm",
+    "variant": "bookworm",
+    "version": "1.10.12"
+  },
+  "1.11": {
+    "built_at": "",
+    "published_digest": "sha256:a828f9998f8cd2111ae283ac4f10f3cbd858412f4c79af8e5a28c39e789d6e95",
+    "published_tag": "1.11.9-20260916",
+    "upstream_digest": "sha256:e85f92b0ca9f9be026c26781d5d128792d1b140d4831c60232e76fc9c0a43e29",
+    "upstream_tag": "1.11.9-bookworm",
+    "variant": "bookworm",
+    "version": "1.11.9"
+  },
+  "1.13": {
+    "built_at": "",
+    "published_digest": "sha256:198385541620524d142556d6a960534a69a673425bf61d6882a6510a65d37083",
+    "published_tag": "1.13.0-20260916",
+    "upstream_digest": "sha256:9160ce27bc8472ff441574a67fda0bbdf71988bc2872d414e51004749b5f219a",
+    "upstream_tag": "1.13.0-bookworm",
+    "variant": "bookworm",
+    "version": "1.13.0"
+  }
+}
