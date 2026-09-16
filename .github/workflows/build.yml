@@ -119,6 +119,11 @@ jobs:
       - name: Record what was built
         run: |
           mkdir -p results
+          # Stamped here rather than from a `github` context property: the
+          # context has run_id/run_number/run_attempt but NOT run_started_at,
+          # so ${{ }} on it expands to the empty string and writes a blank
+          # field that nothing complains about. It shipped that way once.
+          export R_BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           python3 -c '
           import json, os, sys
           keys = ("line", "variant", "version", "upstream_tag", "upstream_digest",
@@ -134,10 +139,7 @@ jobs:
           R_UPSTREAM_DIGEST: ${{ matrix.upstream_digest }}
           R_PUBLISHED_TAG: ${{ matrix.tag }}
           R_PUBLISHED_DIGEST: ${{ steps.push.outputs.digest }}
-          # The build's own wall-clock, in UTC -- the same clock the tag's date
-          # stamp uses. Not the repository's updated_at, which is a different
-          # event entirely and is absent on a scheduled run.
-          R_BUILT_AT: ${{ github.run_started_at }}
+
       - uses: actions/upload-artifact@v7
         with:
           name: result-${{ matrix.line }}
