@@ -121,8 +121,14 @@ jobs:
           mkdir -p results
           # Stamped here rather than from a `github` context property: the
           # context has run_id/run_number/run_attempt but NOT run_started_at,
-          # so ${{ }} on it expands to the empty string and writes a blank
-          # field that nothing complains about. It shipped that way once.
+          # so an expression reading it expands to the empty string and writes
+          # a blank field that nothing complains about. It shipped that way once.
+          #
+          # Do NOT write a literal expression delimiter pair in this file, not
+          # even inside a shell comment: GitHub evaluates expressions anywhere
+          # in the workflow, an empty pair is a syntax error, and the whole
+          # workflow then fails at startup with zero jobs and no log to read.
+          # That is what the comment this replaces did.
           export R_BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           python3 -c '
           import json, os, sys
