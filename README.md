@@ -12,6 +12,18 @@ That is all this adds.
 Design and rationale: `development_notes/10_julia_support_plan.md` in the SIVACOR workspace notes.
 The `10-D*` markers in the `Dockerfile` are that file's decision numbers.
 
+## Images
+
+Images are published to the GitHub
+Container Registry at [`ghcr.io/sivacor`](https://github.com/orgs/SIVACOR/packages) and the source
+is [`SIVACOR/julia`](https://github.com/SIVACOR/julia).
+
+There is one repository per Julia release line — `julia1.10`, `julia1.11` — and a tag per build,
+`<julia version>-<build date>`. A tag always names the same image: when a new Julia is released, or
+when the underlying Debian is rebuilt for a security fix, a **new** tag is published rather than an
+existing one replaced. 
+
+
 ## What it adds to the official image
 
 | | why |
@@ -26,19 +38,6 @@ build time, and a curation list nobody has evidence for. And **no default enviro
 populated**, because that would let `using` succeed against packages the researcher never declared,
 producing a run that works here and nowhere else.
 
-## How a SIVACOR run uses it
-
-Two containers per submission stage. The first resolves, with the network on; the second runs the
-analysis, honouring the submission's own network-isolation setting.
-
-```
-phase 1   julia --startup-file=no --project=. -e 'using Pkg; Pkg.instantiate()'   network: on
-phase 2   julia --startup-file=no --project=. main.jl                             network: per submission
-```
-
-A submission must ship a `Project.toml`. A `Manifest.toml` is optional but strongly encouraged —
-without one, phase 1 resolves whatever versions exist that day and writes the manifest it produced
-into the package, so the run is reproducible after the fact rather than by declaration.
 
 ## Automated builds
 
