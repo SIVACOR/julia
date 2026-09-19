@@ -26,19 +26,6 @@ build time, and a curation list nobody has evidence for. And **no default enviro
 populated**, because that would let `using` succeed against packages the researcher never declared,
 producing a run that works here and nowhere else.
 
-## How a SIVACOR run uses it
-
-Two containers per submission stage. The first resolves, with the network on; the second runs the
-analysis, honouring the submission's own network-isolation setting.
-
-```
-phase 1   julia --startup-file=no --project=. -e 'using Pkg; Pkg.instantiate()'   network: on
-phase 2   julia --startup-file=no --project=. main.jl                             network: per submission
-```
-
-A submission must ship a `Project.toml`. A `Manifest.toml` is optional but strongly encouraged —
-without one, phase 1 resolves whatever versions exist that day and writes the manifest it produced
-into the package, so the run is reproducible after the fact rather than by declaration.
 
 ## Automated builds
 
