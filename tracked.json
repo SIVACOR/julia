@@ -18,12 +18,12 @@
     "version": "1.11.9"
   },
   "1.13": {
-    "built_at": "2026-09-19T04:35:35Z",
-    "published_digest": "sha256:693ed357515b8ddb49620d0fb91b1fc960c0c9695d5c7cf18d2da11f101e8512",
-    "published_tag": "1.13.0-20260919",
-    "upstream_digest": "sha256:4a16cd25727e2ae678c4b4b1dca69c3120396ce69548eb372195d22d5cc377f6",
-    "upstream_tag": "1.13.0-bookworm",
+    "built_at": "2026-09-29T04:39:29Z",
+    "published_digest": "sha256:dd59bf7a6c3607cb693253976c26de302925ac58bf8aa023d09c0bb14bb55ebd",
+    "published_tag": "1.13.1-20260929",
+    "upstream_digest": "sha256:5bb4c1e25b16ccefb462dff4f07ccf97977c46b1c3e2d5b49a15a9f8e0f8b91f",
+    "upstream_tag": "1.13.1-bookworm",
     "variant": "bookworm",
-    "version": "1.13.0"
+    "version": "1.13.1"
   }
 }
