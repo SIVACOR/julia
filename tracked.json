@@ -1,29 +1,29 @@
 {
   "1.10": {
-    "built_at": "2026-09-19T04:33:38Z",
-    "published_digest": "sha256:35d3508e455b681dde951de418c625048159cfe166431016829c6586ab77a2b1",
-    "published_tag": "1.10.12-20260919",
-    "upstream_digest": "sha256:bcffd12cc4683df07fed56e226b29affda931599862a9e0e9971a1de87e80107",
+    "built_at": "2026-10-21T04:36:12Z",
+    "published_digest": "sha256:140483e11e134307589c10e8707b3c5e94a30592572b5b4b9bfc385d03c97a22",
+    "published_tag": "1.10.12-20261021",
+    "upstream_digest": "sha256:582c4636b81e2a311aece815c7597b0aaa33d83993fadacfacee79b7834ffc62",
     "upstream_tag": "1.10.12-bookworm",
     "variant": "bookworm",
     "version": "1.10.12"
   },
   "1.11": {
-    "built_at": "2026-09-19T04:35:38Z",
-    "published_digest": "sha256:258b4645d7fecad315328d6bafe4a60a4024cab54cbf10a8a2b4a6841228bac9",
-    "published_tag": "1.11.9-20260919",
-    "upstream_digest": "sha256:2f3b8e977a200466e274981ecf3836c89b960580bee2dcd9aeb78c550eea3c2f",
+    "built_at": "2026-10-21T04:38:01Z",
+    "published_digest": "sha256:49e6f78d7e298b6e36ce31a7360d9dd00a11a9d90fc27e2da29d26cd1d7a9776",
+    "published_tag": "1.11.9-20261021",
+    "upstream_digest": "sha256:2b67ddca6edaaea0b8a69f96d54e54d3e6deaf803f0d67281855b1a879332d83",
     "upstream_tag": "1.11.9-bookworm",
     "variant": "bookworm",
     "version": "1.11.9"
   },
   "1.13": {
-    "built_at": "2026-09-29T04:39:29Z",
-    "published_digest": "sha256:dd59bf7a6c3607cb693253976c26de302925ac58bf8aa023d09c0bb14bb55ebd",
-    "published_tag": "1.13.1-20260929",
-    "upstream_digest": "sha256:5bb4c1e25b16ccefb462dff4f07ccf97977c46b1c3e2d5b49a15a9f8e0f8b91f",
-    "upstream_tag": "1.13.1-bookworm",
+    "built_at": "2026-10-21T04:37:42Z",
+    "published_digest": "sha256:fc488de1b885f8703889f57760ef48a455c085e8fa077dbcef2df1f3afc2a895",
+    "published_tag": "1.13.2-20261021",
+    "upstream_digest": "sha256:5f09570c9aeace067d79a1730915133eba0f72a31ef2918b5b59e152afa22665",
+    "upstream_tag": "1.13.2-bookworm",
     "variant": "bookworm",
-    "version": "1.13.1"
+    "version": "1.13.2"
   }
 }
