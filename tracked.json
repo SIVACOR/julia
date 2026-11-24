@@ -1,12 +1,12 @@
 {
   "1.10": {
-    "built_at": "2026-11-06T04:24:48Z",
-    "published_digest": "sha256:f894ebe5808cf2c10ee8eff4fd5ee24101bfe7ef0c10379b7060f9f2c0b1fa24",
-    "published_tag": "1.10.13-20261106",
-    "upstream_digest": "sha256:46a7e2f54218c89aaadbe6cbcdbb2e68ced31f118247f6a1366d4a07a75b3ec2",
-    "upstream_tag": "1.10.13-bookworm",
+    "built_at": "2026-11-24T04:26:02Z",
+    "published_digest": "sha256:5e9edf2bd2bb11e8d1e67b707b19736dafebb318ac9a11b763075bc54745527d",
+    "published_tag": "1.10.14-20261124",
+    "upstream_digest": "sha256:d6572c28451e0be66fdcd13a86620f181b63be6234233c32bf9ea61a9f06fb79",
+    "upstream_tag": "1.10.14-bookworm",
     "variant": "bookworm",
-    "version": "1.10.13"
+    "version": "1.10.14"
   },
   "1.11": {
     "built_at": "2026-11-06T04:26:10Z",
