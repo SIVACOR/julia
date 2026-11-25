@@ -1,27 +1,27 @@
 {
   "1.10": {
-    "built_at": "2026-11-24T04:26:02Z",
-    "published_digest": "sha256:5e9edf2bd2bb11e8d1e67b707b19736dafebb318ac9a11b763075bc54745527d",
-    "published_tag": "1.10.14-20261124",
-    "upstream_digest": "sha256:d6572c28451e0be66fdcd13a86620f181b63be6234233c32bf9ea61a9f06fb79",
+    "built_at": "2026-11-25T04:27:09Z",
+    "published_digest": "sha256:e86008ec73720168c55aa2f54e6b1aa660adeeeca7bdb7db9172f2df5bb11de1",
+    "published_tag": "1.10.14-20261125",
+    "upstream_digest": "sha256:40a62c74bc6500c0bb9e93a5dcbfbedeae89ede3d74a9d7bec72b2964e6bce0e",
     "upstream_tag": "1.10.14-bookworm",
     "variant": "bookworm",
     "version": "1.10.14"
   },
   "1.11": {
-    "built_at": "2026-11-06T04:26:10Z",
-    "published_digest": "sha256:3c63a2a534d69f9768bfa587209f38960f6dfa2339010ff4db1964a016c90ba4",
-    "published_tag": "1.11.9-20261106",
-    "upstream_digest": "sha256:51fff9471714bf568780f944af3aebe3b6ea7283d5716b64806713c2f6557a07",
+    "built_at": "2026-11-25T04:28:53Z",
+    "published_digest": "sha256:324239b44d127cc7618a33561029c8173a3b2d01119c08cbf5c716735fcabba8",
+    "published_tag": "1.11.9-20261125",
+    "upstream_digest": "sha256:d291bad1d6ceb1c41571d50c3f382b9fa3588473d8564ef817675958f2dbb753",
     "upstream_tag": "1.11.9-bookworm",
     "variant": "bookworm",
     "version": "1.11.9"
   },
   "1.13": {
-    "built_at": "2026-11-14T04:26:34Z",
-    "published_digest": "sha256:1e8ccfc26fca5dfaf904e996fa731277c19442aadd1b24e7e48f9660e4df72dc",
-    "published_tag": "1.13.4-20261114",
-    "upstream_digest": "sha256:90e815aa98e1b8afc23dced7014405ad7354dc539a26f5ef307006529a9cf28c",
+    "built_at": "2026-11-25T04:28:25Z",
+    "published_digest": "sha256:328b7f9fea17649e43734d881e6a7137aeb765b41321fa368261bb34d74bbe0a",
+    "published_tag": "1.13.4-20261125",
+    "upstream_digest": "sha256:72f205436cbae705df7d816f9a40443e5d4b5d40d8ed768cfd6708d4edea0524",
     "upstream_tag": "1.13.4-bookworm",
     "variant": "bookworm",
     "version": "1.13.4"
